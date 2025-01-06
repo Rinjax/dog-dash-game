@@ -1,30 +1,48 @@
-export default class Input {
-    keys: string[] = [];
 
-    constructor() {
-        window.addEventListener('keydown', e => this.keyPressed);
-        window.addEventListener('keyup', e => this.keyReleased);
+
+export enum Actions {
+    JUMP = 'jump',
+    LEFT = 'left',
+    DUCK = 'duck',
+    RIGHT = 'right',
+    ROLL_ATTACK = 'roll_attack',
+    DIVE_ATTACk = 'dive_attack'
+}
+
+interface KeyBindings {
+    jump: string;
+    left: string;
+    duck: string;
+    right: string;
+    roll_attack: string
+    dive_attack: string
+}
+
+
+export class Input {
+    keys: string[] = [];
+    keyBindings: KeyBindings;
+
+    constructor(binding: KeyBindings) {
+        this.keyBindings = binding;
+
+        window.addEventListener('keydown', e => this.keyPressed(e));
+        window.addEventListener('keyup', e => this.keyReleased(e));
     }
 
     keyPressed(e: KeyboardEvent): void {
-        if ((
-            e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight' ||
-            e.key === 'Space'
-        ) && this.keys.indexOf(e.key) === -1) {
-            this.keys.push(e.key);
-        }
+        console.log(e.key)
+
+        Object.entries(this.keyBindings).some(([attr, val]) => {
+            if (val === e.key && this.keys.indexOf(attr) == -1) this.keys.push(attr);
+        });
+
+        console.log(this.keys)
     }
 
     keyReleased(e: KeyboardEvent): void {
-        if (
-            e.key === 'ArrowDown' ||
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight' ||
-            e.key === 'Space'
-        ) {
-            this.keys.slice(this.keys.indexOf(e.key), 1);
-        }
+        Object.entries(this.keyBindings).some(([attr, val]) => {
+            if (val === e.key) this.keys.splice(this.keys.indexOf(attr), 1);
+        });
     }
 }
