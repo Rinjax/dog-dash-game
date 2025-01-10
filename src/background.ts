@@ -1,4 +1,4 @@
-import Game from "./game";
+import {Game} from "./gameEnv";
 
 interface LayerAsset {
     path: string;
@@ -38,7 +38,8 @@ export class Layer {
 }
 
 export class Background {
-    game: Game;
+    game: Game
+    groundMargin: number = 80;
     width: number = 1667;
     height: number = 500;
     layers: Layer[] = [];

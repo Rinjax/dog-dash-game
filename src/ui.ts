@@ -1,11 +1,11 @@
-import Game from "./game";
+import GameEnv from "./gameEnv";
 
 export default class UI {
-    game: Game;
+    game: GameEnv;
     fontSize: number = 30;
     fontFamily: string = 'helvetica';
 
-    constructor(game: Game) {
+    constructor(game: GameEnv) {
         this.game = game;
     }
 

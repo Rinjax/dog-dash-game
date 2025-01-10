@@ -1,29 +1,21 @@
-import Player from "./player";
 import Display from "./display";
-import { Input } from "./input";
+import {Input} from "./input";
 import {Background} from "./background";
-import {EnemyProcessor} from "./enemy";
-import UI from "./ui";
-import {States} from "./playerState";
+import {GameState, GameStates, StartState} from "./gameState";
 
-export default class Game {
+export default class GameEnv {
     readonly height: number;
     readonly width: number;
-    player: Player;
+
     display: Display;
     input: Input;
-    background: Background;
-    speed: number = 1;
-    groundMargin: number = 80;
-    enemies: EnemyProcessor;
-    score: number = 0;
-    ui: UI;
+    states: GameState[] = [];
+    currentState: GameState;
 
     constructor(canvasId: string, height: number, width: number) {
         this.height = height;
         this.width = width;
         this.display = new Display(canvasId, width, height);
-        this.player = new Player(this);
         this.input = new Input({
             jump: 'w',
             left: 'a',
@@ -32,31 +24,22 @@ export default class Game {
             roll_attack: 'Enter',
             dive_attack: 's'
         });
-        this.background = new Background(this);
-        this.enemies = new EnemyProcessor(this);
-        this.ui = new UI(this);
-
-        this.player.setState(States.RUNNING);
+        this.states.push(new StartState())
+        this.changeState(GameStates.START);
     }
 
     update(deltaTime: number): void {
-        this.checkCollisions()
-
-        this.background.update();
-        this.player.update(this.input, deltaTime);
-
-        //enemies
-        this.enemies.update(deltaTime);
-
+        this.currentState.update(deltaTime)
     }
 
     draw(): void{
-        this.display.ctx.clearRect(0, 0, this.width, this.height);
+        this.currentState.draw(this.display);
+        //this.display.ctx.clearRect(0, 0, this.width, this.height);
 
-        this.background.draw();
-        this.ui.draw();
-        this.enemies.draw();
-        this.player.draw();
+        //this.background.draw();
+        //this.ui.draw();
+        //this.enemies.draw();
+        //this.player.draw();
     }
 
     checkCollisions(): void{
@@ -74,5 +57,24 @@ export default class Game {
                 this.score += e.score;
             }
         })
+    }
+
+    changeState(state: GameStates): void {
+
+        this.currentState = this.states[state];
+        this.currentState.enter();
+    }
+}
+
+export class Game {
+    readonly height: number;
+    readonly width: number;
+    score: number = 0;
+    speed: number = 1;
+    background: Background;
+    groundMargin: number = 80;
+
+    constructor(width: number, height: number) {
+        this.background = new Background(this)
     }
 }

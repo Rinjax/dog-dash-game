@@ -1,6 +1,6 @@
-import Game from "./game";
+import GameEnv from "./gameEnv";
 
-const game = new Game('#canvas', 500, 500);
+const game = new GameEnv('#canvas', 500, 500);
 
 let lastTime = 0;
 

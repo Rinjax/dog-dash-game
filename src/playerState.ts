@@ -1,8 +1,8 @@
 import {Actions, Input} from "./input";
-import Game from "./game";
-import {DustParticle, FireParticle} from "./particle";
+import GameEnv from "./gameEnv";
+import {DustParticle, FireParticle, SplashParticle} from "./particle";
 
-export enum States {
+export enum PlayerStates {
     SITTING,
     RUNNING,
     JUMPING,
@@ -13,10 +13,10 @@ export enum States {
 }
 
 export abstract class State {
-    game: Game;
+    game: GameEnv;
     state: number
 
-    protected constructor(game: Game, state: States) {
+    protected constructor(game: GameEnv, state: PlayerStates) {
         this.game = game;
         this.state = state;
     }
@@ -26,8 +26,8 @@ export abstract class State {
 }
 
 export class Sitting extends State {
-    constructor(game: Game) {
-        super(game, States.SITTING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.SITTING);
         
     }
 
@@ -40,14 +40,14 @@ export class Sitting extends State {
 
     handle(input: Input): void {
         if (input.keys.includes(Actions.LEFT) || input.keys.includes(Actions.RIGHT)) {
-            this.game.player.setState(States.RUNNING)
+            this.game.player.setState(PlayerStates.RUNNING)
         }
     }
 }
 
 export class Running extends State {
-    constructor(game: Game) {
-        super(game, States.RUNNING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.RUNNING);
     }
 
     enter(): void {
@@ -68,18 +68,18 @@ export class Running extends State {
         );
 
         if (input.keys.includes(Actions.DUCK)) {
-            this.game.player.setState(States.SITTING)
+            this.game.player.setState(PlayerStates.SITTING)
         } else if (input.keys.includes(Actions.JUMP)) {
-            this.game.player.setState(States.JUMPING)
+            this.game.player.setState(PlayerStates.JUMPING)
         } else if (input.keys.includes(Actions.ROLL_ATTACK)) {
-            this.game.player.setState(States.ROLLING)
+            this.game.player.setState(PlayerStates.ROLLING)
         }
     }
 }
 
 export class Jumping extends State {
-    constructor(game: Game) {
-        super(game, States.JUMPING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.JUMPING);
     }
 
     enter(): void {
@@ -92,14 +92,14 @@ export class Jumping extends State {
 
     handle(input: Input): void {
         if (input.keys.includes(Actions.ROLL_ATTACK)) {
-            this.game.player.setState(States.ROLLING)
+            this.game.player.setState(PlayerStates.ROLLING)
         } else if (input.keys.includes(Actions.DIVE_ATTACk)) {
-            this.game.player.setState(States.DIVING)
+            this.game.player.setState(PlayerStates.DIVING)
         } else if (this.game.player.vy > this.game.player.vyGravity) {
-            this.game.player.setState(States.FALLING)
+            this.game.player.setState(PlayerStates.FALLING)
         } else if (!input.keys.includes(Actions.JUMP)) {
             this.game.player.vy = this.game.player.vyGravity
-            this.game.player.setState(States.FALLING)
+            this.game.player.setState(PlayerStates.FALLING)
         } else {
             this.game.player.y += this.game.player.vy;
             this.game.player.vy += this.game.player.vyGravity
@@ -108,8 +108,8 @@ export class Jumping extends State {
 }
 
 export class Falling extends State {
-    constructor(game: Game) {
-        super(game, States.FALLING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.FALLING);
     }
 
     enter(): void {
@@ -121,12 +121,12 @@ export class Falling extends State {
 
     handle(input: Input): void {
         if (input.keys.includes(Actions.ROLL_ATTACK)) {
-            this.game.player.setState(States.ROLLING);
+            this.game.player.setState(PlayerStates.ROLLING);
         } else if (input.keys.includes(Actions.DIVE_ATTACk)) {
-            this.game.player.setState(States.DIVING);
+            this.game.player.setState(PlayerStates.DIVING);
         } else if (this.game.player.onGround()) {
             this.game.player.vy = 0;
-            this.game.player.setState(States.RUNNING);
+            this.game.player.setState(PlayerStates.RUNNING);
         } else {
             this.game.player.y += this.game.player.vy;
             this.game.player.vy += this.game.player.vyGravity
@@ -135,8 +135,8 @@ export class Falling extends State {
 }
 
 export class Rolling extends State {
-    constructor(game: Game) {
-        super(game, States.ROLLING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.ROLLING);
         
     }
 
@@ -150,8 +150,8 @@ export class Rolling extends State {
 
     handle(input: Input): void {
         if (!input.keys.includes(Actions.ROLL_ATTACK)) {
-            if (this.game.player.onGround()) this.game.player.setState(States.RUNNING);
-            else this.game.player.setState(States.JUMPING);
+            if (this.game.player.onGround()) this.game.player.setState(PlayerStates.RUNNING);
+            else this.game.player.setState(PlayerStates.JUMPING);
         }
 
         this.game.player.particles.unshift(
@@ -182,8 +182,8 @@ export class Rolling extends State {
 export class Diving extends State {
     yModifier: number = 5;
 
-    constructor(game: Game) {
-        super(game, States.DIVING);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.DIVING);
     }
 
     enter(): void {
@@ -208,8 +208,20 @@ export class Diving extends State {
         );
 
         if (this.game.player.onGround()) {
+            console.log("HERE", this.game.player.y, this.game.player.x);
+            for (let i=0; i<30; i++) {
+                this.game.player.particles.unshift(
+                    new SplashParticle(
+                        this.game,
+                        this.game.player.x - 10,
+                        this.game.player.y - 10,
+                    )
+                );
+            }
             this.game.player.resetY();
-            this.game.player.setState(States.STUNNED)
+            this.game.player.setState(PlayerStates.STUNNED)
+
+
             return
         }
 
@@ -234,8 +246,8 @@ export class Diving extends State {
 }
 
 export class Stunned extends State {
-    constructor(game: Game) {
-        super(game, States.STUNNED);
+    constructor(game: GameEnv) {
+        super(game, PlayerStates.STUNNED);
     }
 
     enter(): void {
