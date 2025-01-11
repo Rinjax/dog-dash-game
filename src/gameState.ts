@@ -20,7 +20,7 @@ export enum GameStates {
     OVER,
 }
 
-export class StartState {
+export class StartState implements GameState {
     input: Input;
     title: string = 'Dog Dash'
     fontSize: number = 40;
@@ -64,19 +64,17 @@ export class StartState {
     }
 }
 
-export class PlayingState {
-    game: GameEnv;
+export class PlayingState implements GameState {
+    game: Game;
     input: Input;
     background: Background;
-    speed: number = 1;
-    groundMargin: number = 80;
     enemies: EnemyProcessor;
     ui: UI;
     player: Player;
 
-    constructor(game: GameEnv) {
+    constructor(game: Game) {
         this.game = game;
-        this.player = new Player(this);
+        this.player = new Player(this.game);
         this.input = new Input({
             jump: 'w',
             left: 'a',
@@ -85,12 +83,14 @@ export class PlayingState {
             roll_attack: 'Enter',
             dive_attack: 's'
         });
-        this.background = new Background(this);
-        this.enemies = new EnemyProcessor(this);
-        this.ui = new UI(this);
+        this.background = new Background(this.game);
+        this.enemies = new EnemyProcessor(this.game, this.background);
+        this.ui = new UI(this.game);
 
         this.player.setState(PlayerStates.RUNNING);
     }
+
+    enter(): void {}
 
     update(deltaTime: number): void {
         //this.checkCollisions()
@@ -100,6 +100,8 @@ export class PlayingState {
 
         //enemies
         //this.enemies.update(deltaTime);
+
+        this.player.update(this.input, deltaTime)
 
     }
 

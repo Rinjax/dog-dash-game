@@ -1,4 +1,5 @@
 import {Game} from "./gameEnv";
+import Display from "./display";
 
 interface LayerAsset {
     path: string;
@@ -31,9 +32,9 @@ export class Layer {
         else this.x -= this.game.speed * this.speedModifier;
     }
 
-    draw(): void {
-        this.game.display.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-        this.game.display.ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
+    draw(display: Display): void {
+        display.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+        display.ctx.drawImage(this.image, this.x + this.width, this.y, this.width, this.height);
     }
 }
 
@@ -67,7 +68,7 @@ export class Background {
     update(): void {
         this.layers.forEach((layer) => layer.update())
     }
-    draw(): void {
-        this.layers.forEach((layer) => layer.draw())
+    draw(display: Display): void {
+        this.layers.forEach((layer) => layer.draw(display))
     }
 }

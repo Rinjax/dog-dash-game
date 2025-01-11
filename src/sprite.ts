@@ -1,3 +1,5 @@
+import Display from "./display";
+import {Particle} from "./particle";
 
 class Sprite {
     readonly width: number = 100;
@@ -25,6 +27,22 @@ class Sprite {
             this.spriteFrameTimer += deltaTime
         }
     }
+
+    draw(display: Display, x: number, y: number): void {
+
+
+        display.ctx.drawImage(
+            this.sprite,
+            this.spriteFrameX * this.width,
+            this.spriteFrameY * this.height,
+            this.width,
+            this.height,
+            x,
+            y,
+            this.width,
+            this.height
+        );
+    }
 }
 
 export class PlayerSprite extends Sprite {
@@ -36,5 +54,35 @@ export class PlayerSprite extends Sprite {
         this.spriteFrameX = 0;
         this.spriteFrameY = 3;
         this.spriteFrameXMax = 8;
+    }
+
+    setSitting(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 5;
+        this.spriteFrameXMax = 4;
+    }
+
+    setJumping(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 1;
+        this.spriteFrameXMax = 6;
+    }
+
+    setFalling(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 2;
+        this.spriteFrameXMax = 6;
+    }
+
+    setRolling(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 6;
+        this.spriteFrameXMax = 6;
+    }
+
+    setStunned(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 4;
+        this.spriteFrameXMax = 10;
     }
 }

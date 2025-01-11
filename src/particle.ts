@@ -1,7 +1,8 @@
-import GameEnv from "./gameEnv";
+import GameEnv, {Game} from "./gameEnv";
+import Display from "./display";
 
 export abstract class Particle {
-    game: GameEnv;
+    game: Game;
     x: number;
     y: number;
     vx: number;
@@ -9,7 +10,7 @@ export abstract class Particle {
     size: number;
     forDeletion: boolean = false;
 
-    protected constructor(game: GameEnv) {
+    protected constructor(game: Game) {
         this.game = game;
     }
 
@@ -20,13 +21,13 @@ export abstract class Particle {
         if (this.size < 0.5) this.forDeletion = true;
     }
 
-    abstract draw(): void;
+    abstract draw(display: Display): void;
 }
 
 export class DustParticle extends Particle {
     colour: string = 'rgba(0,0,0,0.2)';
 
-    constructor(game: GameEnv, x: number, y: number) {
+    constructor(game: Game, x: number, y: number) {
         super(game);
         this.x = x;
         this.y = y;
@@ -35,11 +36,11 @@ export class DustParticle extends Particle {
         this.vy = Math.random();
     }
 
-    draw(): void {
-        this.game.display.ctx.beginPath();
-        this.game.display.ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-        this.game.display.ctx.fillStyle = this.colour;
-        this.game.display.ctx.fill();
+    draw(display: Display): void {
+        display.ctx.beginPath();
+        display.ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+        display.ctx.fillStyle = this.colour;
+        display.ctx.fill();
     }
 }
 
@@ -48,7 +49,7 @@ export class FireParticle extends Particle {
     private angle: number = 0;
     private readonly va: number = 0;
 
-    constructor(game: GameEnv, x: number, y: number) {
+    constructor(game: Game, x: number, y: number) {
         super(game);
         this.sprite = new Image();
         this.sprite.src = './assets/sprites/fire.png';
@@ -66,12 +67,12 @@ export class FireParticle extends Particle {
         this.x += Math.sin(this.angle * 10);
     }
 
-    draw(): void {
-        this.game.display.ctx.save();
-        this.game.display.ctx.translate(this.x, this.y);
-        this.game.display.ctx.rotate(this.angle);
-        this.game.display.ctx.drawImage(this.sprite, 0, 0, this.size, this.size);
-        this.game.display.ctx.restore();
+    draw(display: Display): void {
+        display.ctx.save();
+        display.ctx.translate(this.x, this.y);
+        display.ctx.rotate(this.angle);
+        display.ctx.drawImage(this.sprite, 0, 0, this.size, this.size);
+        display.ctx.restore();
     }
 }
 
@@ -80,7 +81,7 @@ export class SplashParticle extends Particle {
     private vyMax: number;
     vyGravity: number;
 
-    constructor(game: GameEnv, x: number, y: number) {
+    constructor(game: Game, x: number, y: number) {
         super(game);
         this.sprite = new Image();
         this.sprite.src = './assets/sprites/fireb.png';
@@ -112,18 +113,18 @@ export class SplashParticle extends Particle {
         //this.x += Math.sin(this.angle * 10);
     }
 
-    draw(): void {
+    draw(display: Display): void {
         //this.game.display.ctx.save();
         //this.game.display.ctx.translate(this.x, this.y);
         //this.game.display.ctx.rotate(this.angle);
-        this.game.display.ctx.drawImage(this.sprite, this.x, this.y, this.size, this.size);
+        display.ctx.drawImage(this.sprite, this.x, this.y, this.size, this.size);
         //this.game.display.ctx.restore();
     }
 
     onGround(): boolean {
         console.log("YYYY:", this.y)
-        let h = this.game.height - this.size - this.game.groundMargin;
+        let h = this.game.height - this.size - this.game.background.groundMargin;
         console.log(h)
-        return this.y >= this.game.height - this.size - this.game.groundMargin +10;
+        return this.y >= this.game.height - this.size - this.game.background.groundMargin +10;
     }
 }

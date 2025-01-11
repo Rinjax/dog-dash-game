@@ -2,6 +2,7 @@ import Display from "./display";
 import {Input} from "./input";
 import {Background} from "./background";
 import {GameState, GameStates, StartState} from "./gameState";
+import Player from "./player";
 
 export default class GameEnv {
     readonly height: number;
@@ -42,7 +43,7 @@ export default class GameEnv {
         //this.player.draw();
     }
 
-    checkCollisions(): void{
+    /*checkCollisions(): void{
         this.enemies.enemies.forEach(e => {
             if (
                 e.x < this.player.x + this.player.width &&
@@ -57,7 +58,7 @@ export default class GameEnv {
                 this.score += e.score;
             }
         })
-    }
+    }*/
 
     changeState(state: GameStates): void {
 
@@ -71,10 +72,12 @@ export class Game {
     readonly width: number;
     score: number = 0;
     speed: number = 1;
+    //player: Player;
     background: Background;
-    groundMargin: number = 80;
+    //groundMargin: number = 80;
 
     constructor(width: number, height: number) {
+        //this.player = new Player(this);
         this.background = new Background(this)
     }
 }

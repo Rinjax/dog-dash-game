@@ -1,13 +1,17 @@
-import GameEnv from "./gameEnv";
+import {Game} from "./gameEnv";
+import {Background} from "./background";
+import Display from "./display";
 
 export class EnemyProcessor {
-    game: GameEnv;
+    game: Game;
+    background: Background;
     enemies: Enemy[] = [];
     timer: number = 0;
     interval: number = 1000;
 
-    constructor(game: GameEnv) {
+    constructor(game: Game, background: Background) {
         this.game = game;
+        this.background = background;
     }
 
     update(deltaTime: number): void {
@@ -40,7 +44,7 @@ export class EnemyProcessor {
 }
 
 class Enemy {
-    game: GameEnv
+    game: Game
     score: number = 0;
     width: number;
     height: number;
@@ -57,7 +61,7 @@ class Enemy {
     spriteFrameTimer: number = 0;
     forDeletion: boolean = false;
 
-    constructor(game: GameEnv) {
+    constructor(game: Game) {
         this.game = game;
         this.spriteFrameInterval = 1000 / this.spriteFPS
     }
@@ -79,8 +83,8 @@ class Enemy {
         }
     }
 
-    draw(): void {
-        this.game.display.ctx.drawImage(
+    draw(display: Display): void {
+        display.ctx.drawImage(
             this.sprite,
             this.spriteFrameX * this.width,
             0,
@@ -102,7 +106,7 @@ class EnemyFly extends Enemy {
     angle: number = 0;
     va: number;
 
-    constructor(game: GameEnv) {
+    constructor(game: Game) {
         super(game);
         this.score = 2
         this.width = 60;
@@ -126,7 +130,7 @@ class EnemyFly extends Enemy {
 
 class EnemyPlant extends Enemy {
 
-    constructor(game: GameEnv) {
+    constructor(game: Game) {
         super(game);
         this.score = 3;
         this.width = 60;
@@ -140,7 +144,7 @@ class EnemyPlant extends Enemy {
 }
 
 class EnemyBird extends Enemy {
-    constructor(game: GameEnv) {
+    constructor(game: Game) {
         super(game);
         this.score = 5
         this.width = 81.33;
