@@ -109,7 +109,7 @@ export class Jumping extends State {
     handle(input: Input): void {
         if (input.keys.includes(Actions.ROLL_ATTACK)) {
             this.player.setState(PlayerStates.ROLLING)
-        } else if (input.keys.includes(Actions.DIVE_ATTACk)) {
+        } else if (input.keys.includes(Actions.DIVE_ATTACK)) {
             this.player.setState(PlayerStates.DIVING)
         } else if (this.player.vy > this.player.vyGravity) {
             this.player.setState(PlayerStates.FALLING)
@@ -136,7 +136,7 @@ export class Falling extends State {
     handle(input: Input): void {
         if (input.keys.includes(Actions.ROLL_ATTACK)) {
             this.player.setState(PlayerStates.ROLLING);
-        } else if (input.keys.includes(Actions.DIVE_ATTACk)) {
+        } else if (input.keys.includes(Actions.DIVE_ATTACK)) {
             this.player.setState(PlayerStates.DIVING);
         } else if (this.onGround()) {
             this.player.vy = 0;

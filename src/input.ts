@@ -6,7 +6,7 @@ export enum Actions {
     DUCK = 'duck',
     RIGHT = 'right',
     ROLL_ATTACK = 'roll_attack',
-    DIVE_ATTACk = 'dive_attack'
+    DIVE_ATTACK = 'dive_attack'
 }
 
 interface KeyBindings {

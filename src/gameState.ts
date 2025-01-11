@@ -21,13 +21,16 @@ export enum GameStates {
 }
 
 export class StartState implements GameState {
+    gameEnv: GameEnv;
     input: Input;
     title: string = 'Dog Dash'
     fontSize: number = 40;
     fontFamily: string = 'helvetica';
     sprite: PlayerSprite;
 
-    constructor() {
+    constructor(gameEnv: GameEnv) {
+        this.gameEnv = gameEnv;
+        this.input = gameEnv.input;
         this.sprite = new PlayerSprite('./assets/sprites/player.png')
     }
 
@@ -36,7 +39,8 @@ export class StartState implements GameState {
     }
 
     update(deltaTime: number): void {
-        this.sprite.updateAnimation(deltaTime)
+        if (this.input.keys.length > 0) this.gameEnv.changeState(GameStates.PLAYING)
+        else this.sprite.updateAnimation(deltaTime)
     }
 
     draw(display: Display): void {
@@ -60,43 +64,35 @@ export class StartState implements GameState {
         display.ctx.font = `${this.fontSize * 0.6}px ${this.fontFamily}`;
         display.ctx.fillText("Press enter to start", display.width * 0.5, display.height * 0.5 + 10);
 
-       //this.player.draw();
+       this.sprite.draw(display, display.width * 0.5 - this.sprite.width * 0.5, display.height - this.sprite.height - 30);
     }
 }
 
 export class PlayingState implements GameState {
+    gameEnv: GameEnv;
     game: Game;
     input: Input;
-    background: Background;
     enemies: EnemyProcessor;
     ui: UI;
     player: Player;
 
-    constructor(game: Game) {
-        this.game = game;
+    constructor(gameEnv: GameEnv) {
+        this.gameEnv = gameEnv;
+        this.game = new Game(this.gameEnv.width, this.gameEnv.height);
         this.player = new Player(this.game);
-        this.input = new Input({
-            jump: 'w',
-            left: 'a',
-            duck: 's',
-            right: 'd',
-            roll_attack: 'Enter',
-            dive_attack: 's'
-        });
-        this.background = new Background(this.game);
-        this.enemies = new EnemyProcessor(this.game, this.background);
+        this.input = this.gameEnv.input;
+        this.enemies = new EnemyProcessor(this.game, this.player);
         this.ui = new UI(this.game);
-
-        this.player.setState(PlayerStates.RUNNING);
     }
 
-    enter(): void {}
+    enter(): void {
+        this.player.setState(PlayerStates.RUNNING)
+    }
 
     update(deltaTime: number): void {
         //this.checkCollisions()
 
-        //this.background.update();
-        //this.player.update(this.input, deltaTime);
+        this.game.background.update();
 
         //enemies
         //this.enemies.update(deltaTime);
@@ -105,12 +101,12 @@ export class PlayingState implements GameState {
 
     }
 
-    draw(): void {
-        //display.ctx.clearRect(0, 0, this.width, this.height);
+    draw(display: Display): void {
+        display.ctx.clearRect(0, 0, display.width, display.height);
 
-        //this.background.draw();
-        //this.ui.draw();
+        this.game.background.draw(display);
+        this.ui.draw(display);
         //this.enemies.draw();
-        //this.player.draw();
+        this.player.draw(display);
     }
 }

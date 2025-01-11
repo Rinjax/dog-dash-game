@@ -40,7 +40,7 @@ export class Layer {
 
 export class Background {
     game: Game
-    groundMargin: number = 80;
+    groundMargin: number = 90;
     width: number = 1667;
     height: number = 500;
     layers: Layer[] = [];

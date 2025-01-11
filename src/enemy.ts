@@ -1,17 +1,17 @@
 import {Game} from "./gameEnv";
-import {Background} from "./background";
 import Display from "./display";
+import Player from "./player";
 
 export class EnemyProcessor {
     game: Game;
-    background: Background;
+    player: Player;
     enemies: Enemy[] = [];
     timer: number = 0;
     interval: number = 1000;
 
-    constructor(game: Game, background: Background) {
+    constructor(game: Game, player: Player) {
         this.game = game;
-        this.background = background;
+        this.player = player;
     }
 
     update(deltaTime: number): void {
@@ -31,20 +31,21 @@ export class EnemyProcessor {
         //console.log(this.enemies);
     }
 
-    draw(): void {
-        this.enemies.forEach(e => e.draw());
+    draw(display: Display): void {
+        this.enemies.forEach(e => e.draw(display));
     }
 
     protected addEnemy(): void {
-        if (this.game.speed > 0 && Math.random() > 0.6) this.enemies.push(new EnemyPlant(this.game));
+        if (this.game.speed > 0 && Math.random() > 0.6) this.enemies.push(new EnemyPlant(this.game, this.player));
 
-        if (Math.random() > 0.8) this.enemies.push(new EnemyBird(this.game));
-        else this.enemies.push(new EnemyFly(this.game));
+        if (Math.random() > 0.8) this.enemies.push(new EnemyBird(this.game, this.player));
+        else this.enemies.push(new EnemyFly(this.game, this.player));
     }
 }
 
 class Enemy {
     game: Game
+    player: Player;
     score: number = 0;
     width: number;
     height: number;
@@ -61,8 +62,9 @@ class Enemy {
     spriteFrameTimer: number = 0;
     forDeletion: boolean = false;
 
-    constructor(game: Game) {
+    constructor(game: Game, player: Player) {
         this.game = game;
+        this.player = player;
         this.spriteFrameInterval = 1000 / this.spriteFPS
     }
 
@@ -106,8 +108,8 @@ class EnemyFly extends Enemy {
     angle: number = 0;
     va: number;
 
-    constructor(game: Game) {
-        super(game);
+    constructor(game: Game, player: Player) {
+        super(game, player);
         this.score = 2
         this.width = 60;
         this.height = 44;
@@ -130,13 +132,13 @@ class EnemyFly extends Enemy {
 
 class EnemyPlant extends Enemy {
 
-    constructor(game: Game) {
-        super(game);
+    constructor(game: Game, player: Player) {
+        super(game, player);
         this.score = 3;
         this.width = 60;
         this.height = 87;
         this.x = this.game.width;
-        this.y = this.game.height - this.height - this.game.groundMargin;
+        this.y = this.game.height - this.height - this.game.background.groundMargin;
         this.sprite = new Image();
         this.sprite.src = './assets/sprites/enemy_plant.png';
         this.spriteFrameXMax = 1;
@@ -144,8 +146,8 @@ class EnemyPlant extends Enemy {
 }
 
 class EnemyBird extends Enemy {
-    constructor(game: Game) {
-        super(game);
+    constructor(game: Game, player: Player) {
+        super(game, player);
         this.score = 5
         this.width = 81.33;
         this.height = 58;
@@ -159,8 +161,9 @@ class EnemyBird extends Enemy {
     }
 
     update(deltaTime: number): void {
-        this.y += (this.game.player.y - this.y ) * this.vy;
-        this.x -= (this.x - this.game.player.x ) * this.vx;
+        // track player's location
+        this.y += (this.player.y - this.y ) * this.vy;
+        this.x -= (this.x - this.player.x ) * this.vx;
 
         if (this.spriteFrameTimer > this.spriteFrameInterval) {
             this.spriteFrameTimer = 0;

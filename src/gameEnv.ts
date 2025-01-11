@@ -1,7 +1,7 @@
 import Display from "./display";
 import {Input} from "./input";
 import {Background} from "./background";
-import {GameState, GameStates, StartState} from "./gameState";
+import {GameState, GameStates, PlayingState, StartState} from "./gameState";
 import Player from "./player";
 
 export default class GameEnv {
@@ -25,7 +25,7 @@ export default class GameEnv {
             roll_attack: 'Enter',
             dive_attack: 's'
         });
-        this.states.push(new StartState())
+        this.states.push(new StartState(this), new PlayingState(this))
         this.changeState(GameStates.START);
     }
 
@@ -77,7 +77,8 @@ export class Game {
     //groundMargin: number = 80;
 
     constructor(width: number, height: number) {
-        //this.player = new Player(this);
+        this.width = width;
+        this.height = height;
         this.background = new Background(this)
     }
 }

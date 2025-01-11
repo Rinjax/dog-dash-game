@@ -56,7 +56,8 @@ export default class Player {
     }
 
     draw(display: Display): void {
-        this.sprite.draw(display, this.x, this.y);
+        this.sprite.draw(display, this.x +10, this.y +10);
+        console.log(this.x, this.y);
         this.particles.forEach((p: Particle) => p.draw(display))
     }
 
