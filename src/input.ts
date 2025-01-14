@@ -36,8 +36,6 @@ export class Input {
         Object.entries(this.keyBindings).some(([attr, val]) => {
             if (val === e.key && this.keys.indexOf(attr) == -1) this.keys.push(attr);
         });
-
-        console.log(this.keys)
     }
 
     keyReleased(e: KeyboardEvent): void {

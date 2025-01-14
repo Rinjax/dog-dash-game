@@ -1,9 +1,8 @@
 import Display from "./display";
-import {Particle} from "./particle";
 
-class Sprite {
-    readonly width: number = 100;
-    readonly height: number = 91.3;
+export class Sprite {
+    width: number = 0;
+    height: number = 0;
     sprite: HTMLImageElement;
     spriteFrameY: number = 0;
     spriteFrameX: number = 0;
@@ -12,7 +11,10 @@ class Sprite {
     spriteFrameInterval: number;
     spriteFrameTimer: number = 0;
 
-    constructor(assetPath: string) {
+    constructor(assetPath: string, height: number, width: number, frameXMax?: number) {
+        this.height = height;
+        this.width = width;
+        this.spriteFrameXMax = frameXMax;
         this.sprite = new Image();
         this.sprite.src = assetPath;
         this.spriteFrameInterval = 1000 / this.spriteFPS;
@@ -29,8 +31,6 @@ class Sprite {
     }
 
     draw(display: Display, x: number, y: number): void {
-
-
         display.ctx.drawImage(
             this.sprite,
             this.spriteFrameX * this.width,
@@ -46,8 +46,9 @@ class Sprite {
 }
 
 export class PlayerSprite extends Sprite {
-    constructor(assetPath: string) {
-        super(assetPath);
+    constructor(assetPath: string, height: number, width: number) {
+        super(assetPath, height, width);
+        console.log(this);
     }
 
     setRunning(): void {
@@ -85,4 +86,11 @@ export class PlayerSprite extends Sprite {
         this.spriteFrameY = 4;
         this.spriteFrameXMax = 10;
     }
+
+    setHurting(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 9;
+        this.spriteFrameXMax = 4;
+    }
 }
+

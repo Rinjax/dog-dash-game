@@ -1,8 +1,7 @@
 import Display from "./display";
 import {Input} from "./input";
 import {Background} from "./background";
-import {GameState, GameStates, PlayingState, StartState} from "./gameState";
-import Player from "./player";
+import {GameState, GameStates, OverState, PlayingState, StartState} from "./gameState";
 
 export default class GameEnv {
     readonly height: number;
@@ -25,40 +24,13 @@ export default class GameEnv {
             roll_attack: 'Enter',
             dive_attack: 's'
         });
-        this.states.push(new StartState(this), new PlayingState(this))
+        this.states.push(new StartState(this), new PlayingState(this), new OverState(this))
         this.changeState(GameStates.START);
     }
 
-    update(deltaTime: number): void {
-        this.currentState.update(deltaTime)
+    process(deltaTime: number): void {
+        this.currentState.process(deltaTime, this.display)
     }
-
-    draw(): void{
-        this.currentState.draw(this.display);
-        //this.display.ctx.clearRect(0, 0, this.width, this.height);
-
-        //this.background.draw();
-        //this.ui.draw();
-        //this.enemies.draw();
-        //this.player.draw();
-    }
-
-    /*checkCollisions(): void{
-        this.enemies.enemies.forEach(e => {
-            if (
-                e.x < this.player.x + this.player.width &&
-                e.x + e.width > this.player.x &&
-                e.y < this.player.y + this.player.height &&
-                e.y + e.height > this.player.y
-            ) {
-                // check player state
-                  //kill
-                  // hurta
-                e.forDeletion = true;
-                this.score += e.score;
-            }
-        })
-    }*/
 
     changeState(state: GameStates): void {
 
@@ -72,9 +44,8 @@ export class Game {
     readonly width: number;
     score: number = 0;
     speed: number = 1;
-    //player: Player;
     background: Background;
-    //groundMargin: number = 80;
+    over: boolean = false;
 
     constructor(width: number, height: number) {
         this.width = width;
