@@ -242,12 +242,11 @@ export class Diving extends State {
         );
 
         if (this.onGround()) {
-            for (let i=0; i<1; i++) {
+            for (let i=0; i<20; i++) {
                 this.player.particles.unshift(
                     new SplashParticle(
                         this.game,
-                        this.player.x - 10,
-                        this.player.y - 10,
+                        this.player.x - 10
                     )
                 );
             }
@@ -317,7 +316,7 @@ export class Hurting extends State {
             this.hurtTimer = 0
         }
         if (this.player.x > 0) {
-            this.player.x--
+            this.player.x -= 0.5
         }
 
         if (!this.onGround()) {

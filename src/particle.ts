@@ -80,28 +80,35 @@ export class SplashParticle extends Particle {
     private readonly sprite: HTMLImageElement;
     private vyMax: number;
     vyGravity: number;
+    angle: number = 0;
+    va: number = 0;
 
-    constructor(game: Game, x: number, y: number) {
+    constructor(game: Game, x: number) {
         super(game);
         this.sprite = new Image();
-        this.sprite.src = './assets/sprites/fireb.png';
+        this.sprite.src = './assets/sprites/fire.png';
         this.size = 100;
         this.x = x;
-        this.y = y;
         this.vx = Math.random() * 6 - 3;
         this.vy = 0;
         this.vyGravity = 1;
-        this.vyMax = 20;
-        //this.va = Math.random() * 0.2 - 0.1;
+        this.vyMax =  Math.random() * 20 + 5;
+        this.va = Math.random() * 0.2 - 0.1;
+        this.size = Math.random() * 80 + 50;
+
+        this.y = this.game.height - this.game.background.groundMargin - this.size
     }
 
     update(): void {
         //super.update();
 
+        this.size *= 0.996;
+
        if (this.onGround()) {
+           console.log(this.vyMax)
            this.vy -= this.vyMax;
-           this.vyMax -= 5;
-           if (this.vyMax <= 0) {
+           this.vyMax -= 2;
+           if (this.vyMax <= 0 && this.onGround()) {
                this.forDeletion = true;
            }
        }
@@ -109,22 +116,19 @@ export class SplashParticle extends Particle {
         this.vy += this.vyGravity;
         this.x += this.vx + this.game.speed;
 
-        //this.angle += this.va;
-        //this.x += Math.sin(this.angle * 10);
+        this.angle += this.va;
+        this.x += Math.sin(this.angle * 10);
     }
 
     draw(display: Display): void {
-        //this.game.display.ctx.save();
-        //this.game.display.ctx.translate(this.x, this.y);
-        //this.game.display.ctx.rotate(this.angle);
-        display.ctx.drawImage(this.sprite, this.x, this.y, this.size, this.size);
-        //this.game.display.ctx.restore();
+        display.ctx.save();
+        display.ctx.translate(this.x, this.y);
+       // display.ctx.rotate(this.angle);
+        display.ctx.drawImage(this.sprite, 0, 0, this.size, this.size);
+        display.ctx.restore();
     }
 
     onGround(): boolean {
-        console.log("YYYY:", this.y)
-        let h = this.game.height - this.size - this.game.background.groundMargin;
-        console.log(h)
-        return this.y >= h;
+        return this.y >= this.game.height - this.size - this.game.background.groundMargin;
     }
 }

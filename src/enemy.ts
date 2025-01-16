@@ -10,7 +10,7 @@ export class EnemyProcessor {
     enemies: EnemyBasic[] = [];
     enemyExplosions: EnemyKilled[] = [];
     timer: number = 0;
-    interval: number = 1000;
+    interval: number = 10000;
 
     constructor(game: Game, player: Player) {
         this.game = game;

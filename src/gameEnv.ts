@@ -27,7 +27,7 @@ export default class GameEnv {
             dive_attack: 's'
         });
         this.states.push(new StartState(this), new PlayingState(this), new OverState(this))
-        this.changeState(GameStates.OVER);
+        this.changeState(GameStates.START);
     }
 
     process(deltaTime: number): void {
