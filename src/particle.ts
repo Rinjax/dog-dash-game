@@ -90,8 +90,8 @@ export class SplashParticle extends Particle {
         this.y = y;
         this.vx = Math.random() * 6 - 3;
         this.vy = 0;
-        this.vyGravity = 0.9;
-        this.vyMax = 15;
+        this.vyGravity = 1;
+        this.vyMax = 20;
         //this.va = Math.random() * 0.2 - 0.1;
     }
 
@@ -100,8 +100,8 @@ export class SplashParticle extends Particle {
 
        if (this.onGround()) {
            this.vy -= this.vyMax;
-           this.vyMax *= 0.5;
-           if (this.vyMax <= 6) {
+           this.vyMax -= 5;
+           if (this.vyMax <= 0) {
                this.forDeletion = true;
            }
        }
@@ -125,6 +125,6 @@ export class SplashParticle extends Particle {
         console.log("YYYY:", this.y)
         let h = this.game.height - this.size - this.game.background.groundMargin;
         console.log(h)
-        return this.y >= this.game.height - this.size - this.game.background.groundMargin +10;
+        return this.y >= h;
     }
 }

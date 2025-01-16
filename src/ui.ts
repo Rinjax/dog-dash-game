@@ -20,6 +20,7 @@ export default class UI {
     draw(display: Display): void {
        this.displayScore(display);
         this.displayLives(display);
+        this.displayEnergy(display);
     }
 
     displayScore(display: Display): void {
@@ -39,5 +40,14 @@ export default class UI {
         for (let i = 0; i < this.player.lives; i++) {
             display.ctx.drawImage(this.lifeSprite, 68 + i * 25, lineHeight - 10);
         }
+    }
+
+    displayEnergy(display: Display): void {
+        let lineHeight = 157;
+
+        display.ctx.font = `${this.fontSize * 0.7}px ${this.fontFamily}`;
+        display.ctx.textAlign = 'left';
+        display.ctx.textBaseline = 'ideographic';
+        display.ctx.fillText('energy: ' + this.player.energy, this.leftMargin, lineHeight + 10);
     }
 }

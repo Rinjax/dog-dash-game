@@ -7,6 +7,7 @@ export default class GameEnv {
     readonly height: number;
     readonly width: number;
 
+    game: Game;
     display: Display;
     input: Input;
     states: GameState[] = [];
@@ -15,7 +16,8 @@ export default class GameEnv {
     constructor(canvasId: string, height: number, width: number) {
         this.height = height;
         this.width = width;
-        this.display = new Display(canvasId, width, height);
+        this.display = new Display(canvasId, this.width, this.height);
+        this.game = new Game(this.width, this.height);
         this.input = new Input({
             jump: 'w',
             left: 'a',
@@ -25,7 +27,7 @@ export default class GameEnv {
             dive_attack: 's'
         });
         this.states.push(new StartState(this), new PlayingState(this), new OverState(this))
-        this.changeState(GameStates.START);
+        this.changeState(GameStates.OVER);
     }
 
     process(deltaTime: number): void {
@@ -51,5 +53,11 @@ export class Game {
         this.width = width;
         this.height = height;
         this.background = new Background(this)
+    }
+
+    reset(): void {
+        this.score = 0;
+        this.speed = 1;
+        this.over = false;
     }
 }

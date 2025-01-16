@@ -9,11 +9,10 @@ import {
     Sitting,
     State,
     PlayerStates,
-    Hurting
+    Hurting, Dying
 } from "./playerState";
-import {Actions, Input} from "./input";
+import {Input} from "./input";
 import {Particle} from "./particle";
-import {PlayingState} from "./gameState";
 import {PlayerSprite} from "./sprite";
 import Display from "./display";
 
@@ -31,17 +30,18 @@ export default class Player {
     particles: Particle[] = [];
     maxParticles: number = 100;
     lives: number = 5;
+    energy: number = 0;
+    energyMax: number = 100;
     isAttacking = false;
     isInvulnerable: boolean = false;
     invulnerabilityTimeOut: number = 0;
     invulnerabilityTimer: number = 0;
-    invulnerabilityAnimationTimer: number = 0;
-    invulnerabilityAnimationTimeOut: number = 500;
 
 
 
     constructor(game: Game) {
         this.sprite = new PlayerSprite('./assets/sprites/player.png', 91.3, 100);
+        this.energy = this.energyMax;
         this.states.push(
             new Sitting(game, this),
             new Running(game, this),
@@ -51,10 +51,13 @@ export default class Player {
             new Diving(game, this),
             new Stunned(game, this),
             new Hurting(game, this),
+            new Dying(game, this),
         )
     }
 
     update(input: Input, deltaTime: number): void {
+
+        this.rechargeEnergy();
 
         if (this.isInvulnerable) {
             this.invulnerabilityTimer += deltaTime;
@@ -98,5 +101,20 @@ export default class Player {
     exitInvulnerability(): void {
         this.isInvulnerable = false;
         this.invulnerabilityTimeOut = 0;
+    }
+
+    reset(): void {
+        this.lives = 5;
+        this.energy = this.energyMax;
+        this.setState(PlayerStates.RUNNING);
+    }
+
+    rechargeEnergy(): void {
+        if (
+            this.energy < this.energyMax &&
+            ![PlayerStates.ROLLING, PlayerStates.DIVING].includes(this.currentState.state)
+        ) {
+            this.energy++
+        }
     }
 }

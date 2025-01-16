@@ -2,6 +2,7 @@ import {Actions, Input} from "./input";
 import {Game} from "./gameEnv";
 import {DustParticle, FireParticle, SplashParticle} from "./particle";
 import Player from "./player";
+import {GameStates} from "./gameState";
 
 export enum PlayerStates {
     SITTING,
@@ -11,7 +12,8 @@ export enum PlayerStates {
     ROLLING,
     DIVING,
     STUNNED,
-    HURTING
+    HURTING,
+    DYING,
 }
 
 export abstract class State {
@@ -183,6 +185,12 @@ export class Rolling extends State {
             else this.player.setState(PlayerStates.JUMPING);
         }
 
+        this.player.energy--
+        if (this.player.energy <= 0) {
+            this.player.energy = 0;
+            this.player.setState(PlayerStates.STUNNED);
+        }
+
         this.player.particles.unshift(
             new FireParticle(
                 this.game,
@@ -234,7 +242,7 @@ export class Diving extends State {
         );
 
         if (this.onGround()) {
-            for (let i=0; i<30; i++) {
+            for (let i=0; i<1; i++) {
                 this.player.particles.unshift(
                     new SplashParticle(
                         this.game,
@@ -277,6 +285,11 @@ export class Stunned extends State {
             this.player.setState(PlayerStates.SITTING)
             this.stunTimer = 0
         }
+
+        if (!this.onGround()) {
+            this.player.y += this.player.vy;
+            this.player.vy += this.player.vyGravity
+        }
     }
 }
 
@@ -289,7 +302,7 @@ export class Hurting extends State {
     }
 
     enter(): void {
-        this.player.enterInvulnerability(6000)
+        this.player.enterInvulnerability(1500)
         this.player.isAttacking = false;
         this.player.sprite.setHurting();
         this.game.speed = 0;
@@ -310,6 +323,28 @@ export class Hurting extends State {
         if (!this.onGround()) {
             this.player.y += this.player.vy;
             this.player.vy += this.player.vyGravity
+        }
+    }
+}
+
+export class Dying extends State {
+    gameOverTimer: number = 0;
+    gameOverTimeOut: number = 3000;
+
+    constructor(game: Game, player: Player) {
+        super(game, player, PlayerStates.DYING);
+    }
+
+    enter(): void {
+        this.player.sprite.setDying();
+        this.game.speed = 0;
+        this.resetY();
+    }
+
+    handle(input: Input, deltaTime: number): void {
+        this.gameOverTimer += deltaTime;
+        if (this.gameOverTimer > this.gameOverTimeOut) {
+            this.game.over = true;
         }
     }
 }

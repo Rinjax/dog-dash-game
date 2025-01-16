@@ -1,4 +1,5 @@
 import Display from "./display";
+import {PlayerStates} from "./playerState";
 
 export class Sprite {
     width: number = 0;
@@ -7,7 +8,7 @@ export class Sprite {
     spriteFrameY: number = 0;
     spriteFrameX: number = 0;
     spriteFrameXMax: number = 0;
-    readonly spriteFPS: number = 20;
+    spriteFPS: number = 20;
     spriteFrameInterval: number;
     spriteFrameTimer: number = 0;
 
@@ -46,51 +47,78 @@ export class Sprite {
 }
 
 export class PlayerSprite extends Sprite {
+    state: PlayerStates;
+
     constructor(assetPath: string, height: number, width: number) {
         super(assetPath, height, width);
-        console.log(this);
+    }
+
+    updateAnimation(deltaTime: number): void {
+        if (this.spriteFrameTimer > this.spriteFrameInterval) {
+            this.spriteFrameTimer = 0;
+            if (this.spriteFrameX < this.spriteFrameXMax) this.spriteFrameX++;
+            else if (this.state == PlayerStates.DYING)this.spriteFrameX = this.spriteFrameXMax;
+            else this.spriteFrameX = 0;
+        } else {
+            this.spriteFrameTimer += deltaTime
+        }
     }
 
     setRunning(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 3;
         this.spriteFrameXMax = 8;
+        this.state = PlayerStates.RUNNING;
     }
 
     setSitting(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 5;
         this.spriteFrameXMax = 4;
+        this.state = PlayerStates.SITTING;
     }
 
     setJumping(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 1;
         this.spriteFrameXMax = 6;
+        this.state = PlayerStates.JUMPING;
     }
 
     setFalling(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 2;
         this.spriteFrameXMax = 6;
+        this.state = PlayerStates.FALLING;
     }
 
     setRolling(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 6;
         this.spriteFrameXMax = 6;
+        this.state = PlayerStates.ROLLING;
     }
 
     setStunned(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 4;
         this.spriteFrameXMax = 10;
+        this.state = PlayerStates.STUNNED;
     }
 
     setHurting(): void {
         this.spriteFrameX = 0;
         this.spriteFrameY = 9;
         this.spriteFrameXMax = 4;
+        this.state = PlayerStates.HURTING;
+    }
+
+    setDying(): void {
+        this.spriteFrameX = 0;
+        this.spriteFrameY = 8;
+        this.spriteFrameXMax = 11;
+        this.state = PlayerStates.DYING;
+        this.spriteFPS = 10;
     }
 }
 

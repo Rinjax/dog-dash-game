@@ -10,7 +10,7 @@ export class EnemyProcessor {
     enemies: EnemyBasic[] = [];
     enemyExplosions: EnemyKilled[] = [];
     timer: number = 0;
-    interval: number = 10000;
+    interval: number = 1000;
 
     constructor(game: Game, player: Player) {
         this.game = game;
@@ -45,7 +45,7 @@ export class EnemyProcessor {
 
     processEnemies(deltaTime: number, display: Display): void {
         if (this.timer >= this.interval) {
-            this.addEnemy();
+            if (this.player.currentState.state !== PlayerStates.DYING) this.addEnemy();
             this.timer = 0;
         } else {
             this.timer += deltaTime;
@@ -62,12 +62,12 @@ export class EnemyProcessor {
                 }else if (this.player.isInvulnerable) {
                     e.forDeletion = true;
                     return;
-                } else if (!this.player.isInvulnerable && this.player.currentState.state != PlayerStates.HURTING) {
+                } else if (!this.player.isInvulnerable && ![PlayerStates.HURTING, PlayerStates.DYING].includes(this.player.currentState.state)) {
                     this.player.setState(PlayerStates.HURTING)
                     this.game.score--
                     this.player.lives--
                     if (this.player.lives <= 0) {
-                        this.game.over = true;
+                        this.player.setState(PlayerStates.DYING)
                     }
                 }
             }
@@ -76,6 +76,12 @@ export class EnemyProcessor {
         });
 
         this.enemies = this.enemies.filter(e => !e.forDeletion);
+    }
+
+    reset(): void {
+        this.enemies= [];
+        this.enemyExplosions = [];
+        this.timer = 0;
     }
 }
 

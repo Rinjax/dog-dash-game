@@ -2,7 +2,6 @@ import GameEnv, {Game} from "./gameEnv";
 import Player from "./player";
 import {PlayerStates} from "./playerState";
 import {Input} from "./input";
-import {Background} from "./background";
 import {EnemyProcessor} from "./enemy";
 import UI from "./ui";
 import {PlayerSprite} from "./sprite";
@@ -11,8 +10,6 @@ import Display from "./display";
 export interface GameState {
     enter(): void
     process(deltaTime: number, display: Display): void
-    //update(deltaTime: number): void
-    //draw(display: Display): void
 }
 
 export enum GameStates {
@@ -84,7 +81,7 @@ export class PlayingState implements GameState {
 
     constructor(gameEnv: GameEnv) {
         this.gameEnv = gameEnv;
-        this.game = new Game(this.gameEnv.width, this.gameEnv.height);
+        this.game = gameEnv.game;
         this.player = new Player(this.game);
         this.input = this.gameEnv.input;
         this.enemies = new EnemyProcessor(this.game, this.player);
@@ -92,7 +89,9 @@ export class PlayingState implements GameState {
     }
 
     enter(): void {
-        this.player.setState(PlayerStates.RUNNING)
+        this.player.reset()
+        this.game.reset();
+        this.enemies.reset();
     }
 
     process(deltaTime: number, display: Display): void {
@@ -111,10 +110,7 @@ export class PlayingState implements GameState {
         } else {
             this.gameEnv.changeState(GameStates.OVER)
         }
-
     }
-
-
 }
 
 export class OverState implements GameState {
@@ -159,7 +155,8 @@ export class OverState implements GameState {
         display.ctx.textAlign = "center";
         display.ctx.fillStyle = "white";
         display.ctx.font = `${this.fontSize * 0.6}px ${this.fontFamily}`;
-        display.ctx.fillText("Press enter to start", display.width * 0.5, display.height * 0.5 + 10);
+        display.ctx.fillText("Score " + this.gameEnv.game.score, display.width * 0.5, display.height * 0.4);
+        display.ctx.fillText("Press enter to play again", display.width * 0.5, display.height * 0.5 + 20);
 
         this.sprite.draw(display, display.width * 0.5 - this.sprite.width * 0.5, display.height - this.sprite.height - 30);
     }
