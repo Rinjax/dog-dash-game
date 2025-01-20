@@ -47,8 +47,6 @@ export abstract class State {
     }
 
     resetY(): void {
-        let r = this.game.height - this.player.sprite.height - this.game.background.groundMargin;
-        console.log('YY', this.game.height, this.player.sprite.height, this.game.background.groundMargin, r);
         this.player.y = this.game.height - this.player.sprite.height - this.game.background.groundMargin;
     }
 }
@@ -200,7 +198,6 @@ export class Rolling extends State {
         );
 
         if (input.keys.includes(Actions.JUMP) && this.onGround()) {
-            console.log("JUMP ROLL")
             this.player.vy -= this.player.vyMax;
             this.player.y += this.player.vy;
         }
@@ -233,7 +230,7 @@ export class Diving extends State {
 
     handle(input: Input, deltaTime: number): void {
 
-        this.player.particles.unshift(
+        this.player.particles.push(
             new FireParticle(
                 this.game,
                 this.player.x - 5 ,
@@ -242,8 +239,9 @@ export class Diving extends State {
         );
 
         if (this.onGround()) {
+            this.player.energy = 0;
             for (let i=0; i<20; i++) {
-                this.player.particles.unshift(
+                this.player.projectiles.push(
                     new SplashParticle(
                         this.game,
                         this.player.x - 10

@@ -9,14 +9,18 @@ export class EnemyProcessor {
     player: Player;
     enemies: EnemyBasic[] = [];
     enemyExplosions: EnemyKilled[] = [];
-    timer: number = 0;
-    interval: number = 10000;
+    timer: number = 0; // Active time between new enemies.
+    interval: number = 1000; // The time interval in milisec to add new enemies
 
     constructor(game: Game, player: Player) {
         this.game = game;
         this.player = player;
     }
 
+    /**
+     * addEnemy adds a new random enemy to the game
+     * @protected
+     */
     protected addEnemy(): void {
         if (this.game.speed > 0 && Math.random() > 0.6) this.enemies.push(new EnemyPlant(this.game, this.player));
 
@@ -25,15 +29,40 @@ export class EnemyProcessor {
         else this.enemies.push(new EnemyFly(this.game, this.player));
     }
 
-    protected checkCollision(enemy: EnemyBasic): boolean{
+    /**
+     * checkPlayerCollision checks specifically if the provided enemy sprite has collided with the player's sprite
+     * @param enemy
+     * @protected
+     */
+    protected checkPlayerCollision(enemy: EnemyBasic): boolean{
         return (
             enemy.x < this.player.x + this.player.sprite.width &&
             enemy.x + enemy.sprite.width > this.player.x &&
             enemy.y < this.player.y + this.player.sprite.height &&
             enemy.y + enemy.sprite.height > this.player.y
-        )
+        );
     }
 
+    /**
+     * checkPlayerProjectileCollision checks specifically if the provided enemy has collided with any of the current
+     * player's projectiles
+     * @param enemy
+     * @protected
+     */
+    protected checkPlayerProjectileCollision(enemy: EnemyBasic): boolean{
+        return this.player.projectiles.some(p => {
+            return enemy.x < p.x + 100 &&
+                enemy.x + enemy.sprite.width > p.x &&
+                enemy.y < p.y + 100 &&
+                enemy.y + enemy.sprite.height > p.y
+        });
+    }
+
+    /**
+     * processKilledEnemies runs the animations for the killed enemies
+     * @param deltaTime
+     * @param display
+     */
     processKilledEnemies(deltaTime: number, display: Display): void {
         this.enemyExplosions.forEach(e => {
             e.update(deltaTime);
@@ -43,6 +72,12 @@ export class EnemyProcessor {
         this.enemyExplosions = this.enemyExplosions.filter(e => !e.forDeletion)
     }
 
+    /**
+     * processEnemies processes each enemy, checking for collisions and player states, reacting accordingly by updating
+     * scores, player lives etc
+     * @param deltaTime
+     * @param display
+     */
     processEnemies(deltaTime: number, display: Display): void {
         if (this.timer >= this.interval) {
             if (this.player.currentState.state !== PlayerStates.DYING) this.addEnemy();
@@ -52,22 +87,33 @@ export class EnemyProcessor {
         }
 
         this.enemies.forEach(e => {
-            e.update(deltaTime)
-            if (this.checkCollision(e)) {
+            e.update(deltaTime);
+
+            if (e.offEdgeScreen()) e.forDeletion = true;
+
+            else if (this.checkPlayerProjectileCollision(e)) {
+                this.game.score += e.score;
+                e.forDeletion = true;
+                this.enemyExplosions.push(new EnemyKilled(this.game, e.x, e.y));
+            }
+
+            else if (this.checkPlayerCollision(e)) {
+                e.forDeletion = true;
+                this.enemyExplosions.push(new EnemyKilled(this.game, e.x, e.y));
+
                 if (this.player.isAttacking) {
-                    e.forDeletion = true;
                     this.game.score += e.score;
-                    this.enemyExplosions.push(new EnemyKilled(this.game, e.x, e.y))
 
                 }else if (this.player.isInvulnerable) {
-                    e.forDeletion = true;
                     return;
+
                 } else if (!this.player.isInvulnerable && ![PlayerStates.HURTING, PlayerStates.DYING].includes(this.player.currentState.state)) {
-                    this.player.setState(PlayerStates.HURTING)
-                    this.game.score--
-                    this.player.lives--
+                    this.player.setState(PlayerStates.HURTING);
+                    this.game.score -= 10 + e.score;
+                    this.player.lives--;
+                    this.player.energy -= 10;
                     if (this.player.lives <= 0) {
-                        this.player.setState(PlayerStates.DYING)
+                        this.player.setState(PlayerStates.DYING);
                     }
                 }
             }
@@ -78,6 +124,10 @@ export class EnemyProcessor {
         this.enemies = this.enemies.filter(e => !e.forDeletion);
     }
 
+    /**
+     * reset is a helper method for resetting the game back to a fresh instance. Clears the arrays and resets the timer
+     * back to zero
+     */
     reset(): void {
         this.enemies= [];
         this.enemyExplosions = [];

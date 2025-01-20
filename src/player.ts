@@ -29,6 +29,7 @@ export default class Player {
     currentState: State;
     particles: Particle[] = [];
     maxParticles: number = 100;
+    projectiles: Particle[] = [];
     lives: number = 5;
     energy: number = 0;
     energyMax: number = 100;
@@ -59,6 +60,7 @@ export default class Player {
 
         this.rechargeEnergy();
 
+
         if (this.isInvulnerable) {
             this.invulnerabilityTimer += deltaTime;
             if (this.invulnerabilityTimer > this.invulnerabilityTimeOut) {
@@ -76,6 +78,12 @@ export default class Player {
             this.particles = this.particles.slice(0, this.maxParticles);
         }
 
+        this.projectiles.forEach((p: Particle, i: number) => {
+            p.update()
+        })
+
+        this.projectiles = this.projectiles.filter(e => !e.forDeletion);
+
         this.currentState.handle(input, deltaTime)
 
         this.sprite.updateAnimation(deltaTime)
@@ -85,6 +93,7 @@ export default class Player {
 
         this.sprite.draw(display, this.x +10, this.y +10);
         this.particles.forEach((p: Particle) => p.draw(display))
+        this.projectiles.forEach((p: Particle) => p.draw(display))
     }
 
     setState(state: PlayerStates): void {
@@ -112,7 +121,7 @@ export default class Player {
     rechargeEnergy(): void {
         if (
             this.energy < this.energyMax &&
-            ![PlayerStates.ROLLING, PlayerStates.DIVING].includes(this.currentState.state)
+            ![PlayerStates.ROLLING, PlayerStates.DIVING, PlayerStates.STUNNED].includes(this.currentState.state)
         ) {
             this.energy++
         }

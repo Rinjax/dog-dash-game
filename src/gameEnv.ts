@@ -3,6 +3,10 @@ import {Input} from "./input";
 import {Background} from "./background";
 import {GameState, GameStates, OverState, PlayingState, StartState} from "./gameState";
 
+/**
+ * GameEnv is the main wrapper around the whole game environment. Responsible for instantiating the states of the
+ * game and all dependencies.
+ */
 export default class GameEnv {
     readonly height: number;
     readonly width: number;
@@ -35,12 +39,15 @@ export default class GameEnv {
     }
 
     changeState(state: GameStates): void {
-
         this.currentState = this.states[state];
         this.currentState.enter();
     }
 }
 
+/**
+ * Game is the main class that holds the attributes of the playing game, such as the player's score, the game speed
+ * and background (level)
+ */
 export class Game {
     readonly height: number;
     readonly width: number;
@@ -55,6 +62,9 @@ export class Game {
         this.background = new Background(this)
     }
 
+    /**
+     * reset is a helper method to reset the game back to a fresh start
+     */
     reset(): void {
         this.score = 0;
         this.speed = 1;

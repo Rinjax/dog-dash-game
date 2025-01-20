@@ -31,8 +31,6 @@ export class Input {
     }
 
     keyPressed(e: KeyboardEvent): void {
-        console.log(e.key)
-
         Object.entries(this.keyBindings).some(([attr, val]) => {
             if (val === e.key && this.keys.indexOf(attr) == -1) this.keys.push(attr);
         });

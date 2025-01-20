@@ -12,4 +12,4 @@ function run(timestamp: number): void {
     requestAnimationFrame(run)
 }
 
-run(0)
+run(lastTime);

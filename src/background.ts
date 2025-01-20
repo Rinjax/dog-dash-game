@@ -1,6 +1,9 @@
 import {Game} from "./gameEnv";
 import Display from "./display";
 
+/**
+ * LayerAsset interface describes the config object needed to insert layers that make up the parallax background
+ */
 interface LayerAsset {
     path: string;
     speedModifier: number;

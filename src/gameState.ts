@@ -1,6 +1,5 @@
 import GameEnv, {Game} from "./gameEnv";
 import Player from "./player";
-import {PlayerStates} from "./playerState";
 import {Input} from "./input";
 import {EnemyProcessor} from "./enemy";
 import UI from "./ui";

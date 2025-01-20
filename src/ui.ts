@@ -5,7 +5,7 @@ import Player from "./player";
 export default class UI {
     game: Game;
     player: Player;
-    fontSize: number = 30;
+    fontSize: number = 22;
     fontFamily: string = 'helvetica';
     leftMargin: number = 10;
     lifeSprite: HTMLImageElement;
@@ -24,30 +24,32 @@ export default class UI {
     }
 
     displayScore(display: Display): void {
-        display.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
+        let lineHeight = 100;
+
+        display.ctx.font = `${this.fontSize * 0.9}px ${this.fontFamily}`;
         display.ctx.textAlign = 'left';
-        display.ctx.fillText('Score: ' + this.game.score, this.leftMargin, 40)
+        display.ctx.fillText('Score: ' + this.game.score, this.leftMargin, lineHeight)
     }
 
     displayLives(display: Display): void {
-        let lineHeight = 57;
+        let lineHeight = 40;
 
-        display.ctx.font = `${this.fontSize * 0.7}px ${this.fontFamily}`;
+        display.ctx.font = `${this.fontSize}px ${this.fontFamily}`;
         display.ctx.textAlign = 'left';
         display.ctx.textBaseline = 'ideographic';
-        display.ctx.fillText('Lives:', this.leftMargin, lineHeight + 10);
+        display.ctx.fillText('Lives:', this.leftMargin, lineHeight);
 
         for (let i = 0; i < this.player.lives; i++) {
-            display.ctx.drawImage(this.lifeSprite, 68 + i * 25, lineHeight - 10);
+            display.ctx.drawImage(this.lifeSprite, 68 + i * 25, lineHeight - this.lifeSprite.height + 3);
         }
     }
 
     displayEnergy(display: Display): void {
-        let lineHeight = 157;
+        let lineHeight = 60;
 
-        display.ctx.font = `${this.fontSize * 0.7}px ${this.fontFamily}`;
+        display.ctx.font = `${this.fontSize * 0.9}px ${this.fontFamily}`;
         display.ctx.textAlign = 'left';
         display.ctx.textBaseline = 'ideographic';
-        display.ctx.fillText('energy: ' + this.player.energy, this.leftMargin, lineHeight + 10);
+        display.ctx.fillText('Energy: ' + this.player.energy, this.leftMargin, lineHeight + 10);
     }
 }

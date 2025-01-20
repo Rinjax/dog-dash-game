@@ -80,8 +80,6 @@ export class SplashParticle extends Particle {
     private readonly sprite: HTMLImageElement;
     private vyMax: number;
     vyGravity: number;
-    angle: number = 0;
-    va: number = 0;
 
     constructor(game: Game, x: number) {
         super(game);
@@ -93,8 +91,7 @@ export class SplashParticle extends Particle {
         this.vy = 0;
         this.vyGravity = 1;
         this.vyMax =  Math.random() * 20 + 5;
-        this.va = Math.random() * 0.2 - 0.1;
-        this.size = Math.random() * 80 + 50;
+        //this.size = Math.random() * 80 + 50;
 
         this.y = this.game.height - this.game.background.groundMargin - this.size
     }
@@ -105,7 +102,6 @@ export class SplashParticle extends Particle {
         this.size *= 0.996;
 
        if (this.onGround()) {
-           console.log(this.vyMax)
            this.vy -= this.vyMax;
            this.vyMax -= 2;
            if (this.vyMax <= 0 && this.onGround()) {
@@ -115,17 +111,10 @@ export class SplashParticle extends Particle {
         this.y += this.vy;
         this.vy += this.vyGravity;
         this.x += this.vx + this.game.speed;
-
-        this.angle += this.va;
-        this.x += Math.sin(this.angle * 10);
     }
 
     draw(display: Display): void {
-        display.ctx.save();
-        display.ctx.translate(this.x, this.y);
-       // display.ctx.rotate(this.angle);
-        display.ctx.drawImage(this.sprite, 0, 0, this.size, this.size);
-        display.ctx.restore();
+        display.ctx.drawImage(this.sprite, this.x, this.y, this.size, this.size);
     }
 
     onGround(): boolean {
